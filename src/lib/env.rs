@@ -18,6 +18,12 @@ pub struct Env {
     #[clap(env)]
     pub google_project_id: String,
 
+    #[clap(env)]
+    pub firebase_database: String,
+
+    #[clap(env)]
+    pub firebase_project_id: String,
+
     #[clap(env, default_value = "development", value_enum)]
     pub env: AppEnv,
 }
