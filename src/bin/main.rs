@@ -3,7 +3,10 @@ use std::sync::Arc;
 use anyhow::Result;
 use clap::Parser;
 use member::{
-    application::http::{HttpServer, HttpServerConfig}, domain::member::services::MemberServiceImpl, env::Env, infrastructure::member::db::firestore_member_repository::FirestoreMemberRepository
+    application::http::{HttpServer, HttpServerConfig},
+    domain::member::services::MemberServiceImpl,
+    env::Env,
+    infrastructure::member::db::firestore_member_repository::FirestoreMemberRepository,
 };
 use member::{env::AppEnv, infrastructure::db::firestore::Firestore};
 
