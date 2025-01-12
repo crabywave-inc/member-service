@@ -35,10 +35,10 @@ async fn main() -> Result<()> {
     let firestore = Arc::new(Firestore::new(Arc::clone(&env)).await?);
 
     let member_repository = FirestoreMemberRepository::new(Arc::clone(&firestore));
-    let _member_service = MemberServiceImpl::new(member_repository);
+    let member_service = Arc::new(MemberServiceImpl::new(member_repository));
 
     let server_config = HttpServerConfig::new(env.port.clone());
-    let http_server = HttpServer::new(server_config).await?;
+    let http_server = HttpServer::new(server_config, Arc::clone(&env), Arc::clone(&member_service)).await?;
 
     http_server.run().await?;
 

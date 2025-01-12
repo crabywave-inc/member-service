@@ -1,6 +1,18 @@
+use std::sync::Arc;
+
 use anyhow::Context;
-use axum::Router;
+use auth::AuthenticationLayer;
+use axum::routing::get;
+use axum::{Extension, Router};
+use handlers::get_members_guild::get_members_guild;
 use tracing::{info, info_span};
+
+use crate::domain::member::ports::MemberService;
+use crate::env::Env;
+
+pub mod handlers;
+pub mod responses;
+pub mod auth;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HttpServerConfig {
@@ -12,13 +24,25 @@ impl HttpServerConfig {
         Self { port }
     }
 }
+
+#[derive(Clone)]
+struct AppState<M>
+where
+    M: MemberService,
+{
+    member_service: Arc<M>,
+}
+
 pub struct HttpServer {
     router: axum::Router,
     listener: tokio::net::TcpListener,
 }
 
 impl HttpServer {
-    pub async fn new(config: HttpServerConfig) -> anyhow::Result<Self> {
+    pub async fn new<M>(config: HttpServerConfig, env: Arc<Env>, member_service: Arc<M>) -> anyhow::Result<Self>
+    where
+        M: MemberService,
+    {
         let trace_layer = tower_http::trace::TraceLayer::new_for_http().make_span_with(
             |request: &axum::extract::Request| {
                 let uri: String = request.uri().to_string();
@@ -26,7 +50,18 @@ impl HttpServer {
             },
         );
 
-        let router = Router::new().nest("", api_routes()).layer(trace_layer);
+        let state = AppState {
+            member_service: Arc::clone(&member_service),
+        };
+
+        let auth_layer = AuthenticationLayer::new(env.auth_service_url.clone());
+
+        let router = Router::new()
+            .nest("", api_routes())
+            .layer(trace_layer)
+            .layer(auth_layer)
+            .layer(Extension(Arc::clone(&state.member_service)))
+            .with_state(state);
 
         let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))
             .await
@@ -49,6 +84,9 @@ impl HttpServer {
     }
 }
 
-fn api_routes() -> axum::Router {
-    axum::Router::new()
+fn api_routes<M>() -> axum::Router<AppState<M>>
+where
+    M: MemberService,
+{
+    axum::Router::new().route("/guilds/:guild_id/members", get(get_members_guild::<M>))
 }
