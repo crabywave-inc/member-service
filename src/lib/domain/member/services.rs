@@ -25,11 +25,17 @@ where
     M: MemberRepository,
 {
     async fn find_by_id(&self, id: &str) -> Result<Member, MemberError> {
-        self.member_repository.find_by_id(id).await
+        self.member_repository
+            .find_by_id(id)
+            .await?
+            .ok_or(MemberError::NotFound)
     }
 
     async fn find_by_user_id(&self, user_id: &str) -> Result<Member, MemberError> {
-        self.member_repository.find_by_user_id(user_id).await
+        self.member_repository
+            .find_by_user_id(user_id)
+            .await?
+            .ok_or(MemberError::NotFound)
     }
 
     async fn find_by_guild_id(&self, id: &str) -> Result<Vec<Member>, MemberError> {
