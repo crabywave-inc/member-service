@@ -38,7 +38,8 @@ async fn main() -> Result<()> {
     let member_service = Arc::new(MemberServiceImpl::new(member_repository));
 
     let server_config = HttpServerConfig::new(env.port.clone());
-    let http_server = HttpServer::new(server_config, Arc::clone(&env), Arc::clone(&member_service)).await?;
+    let http_server =
+        HttpServer::new(server_config, Arc::clone(&env), Arc::clone(&member_service)).await?;
 
     http_server.run().await?;
 

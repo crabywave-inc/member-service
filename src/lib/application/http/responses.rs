@@ -32,13 +32,13 @@ pub struct ApiResponseError {
 }
 
 impl From<MemberError> for ApiError {
-  fn from(value: MemberError) -> Self {
-    match value {
-      MemberError::NotFound => ApiError::NotFound("Member not found".to_string()),
-      MemberError::Unauthorized => ApiError::Unauthorized("Unauthorized".to_string()),
-      MemberError::Forbidden => ApiError::Forbidden("Forbidden".to_string()),
-      MemberError::CreateError(e) => ApiError::InternalServerError(e),
-      MemberError::DeleteError(e) => ApiError::InternalServerError(e),
+    fn from(value: MemberError) -> Self {
+        match value {
+            MemberError::NotFound => ApiError::NotFound("Member not found".to_string()),
+            MemberError::Unauthorized => ApiError::Unauthorized("Unauthorized".to_string()),
+            MemberError::Forbidden => ApiError::Forbidden("Forbidden".to_string()),
+            MemberError::CreateError(e) => ApiError::InternalServerError(e),
+            MemberError::DeleteError(e) => ApiError::InternalServerError(e),
+        }
     }
-  }
 }

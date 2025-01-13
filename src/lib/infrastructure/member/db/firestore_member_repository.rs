@@ -1,6 +1,12 @@
 use std::sync::Arc;
 
-use crate::{domain::member::ports::MemberRepository, infrastructure::db::firestore::Firestore};
+use crate::{
+    domain::member::{
+        entities::{error::MemberError, model::Member},
+        ports::MemberRepository,
+    },
+    infrastructure::db::firestore::Firestore,
+};
 
 #[derive(Debug, Clone)]
 pub struct FirestoreMemberRepository {
@@ -14,23 +20,15 @@ impl FirestoreMemberRepository {
 }
 
 impl MemberRepository for FirestoreMemberRepository {
-    async fn find_by_id(
-        &self,
-        _id: &str,
-    ) -> Result<
-        crate::domain::member::entities::model::Member,
-        crate::domain::member::entities::error::MemberError,
-    > {
+    async fn find_by_id(&self, _id: &str) -> Result<Member, MemberError> {
         unimplemented!()
     }
 
-    async fn find_by_user_id(
-        &self,
-        _user_id: &str,
-    ) -> Result<
-        crate::domain::member::entities::model::Member,
-        crate::domain::member::entities::error::MemberError,
-    > {
+    async fn find_by_user_id(&self, _user_id: &str) -> Result<Member, MemberError> {
+        unimplemented!()
+    }
+
+    async fn find_by_guild_id(&self, _guild_id: &str) -> Result<Vec<Member>, MemberError> {
         unimplemented!()
     }
 }

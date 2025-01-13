@@ -10,9 +10,9 @@ use tracing::{info, info_span};
 use crate::domain::member::ports::MemberService;
 use crate::env::Env;
 
+pub mod auth;
 pub mod handlers;
 pub mod responses;
-pub mod auth;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HttpServerConfig {
@@ -39,7 +39,11 @@ pub struct HttpServer {
 }
 
 impl HttpServer {
-    pub async fn new<M>(config: HttpServerConfig, env: Arc<Env>, member_service: Arc<M>) -> anyhow::Result<Self>
+    pub async fn new<M>(
+        config: HttpServerConfig,
+        env: Arc<Env>,
+        member_service: Arc<M>,
+    ) -> anyhow::Result<Self>
     where
         M: MemberService,
     {

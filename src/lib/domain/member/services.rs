@@ -34,4 +34,11 @@ where
     ) -> Result<super::entities::model::Member, super::entities::error::MemberError> {
         unimplemented!()
     }
+
+    async fn find_by_guild_id(
+        &self,
+        id: &str,
+    ) -> Result<Vec<super::entities::model::Member>, super::entities::error::MemberError> {
+        self.member_repository.find_by_guild_id(id).await
+    }
 }
