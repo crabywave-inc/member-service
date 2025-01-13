@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use auth::AuthenticationLayer;
-use axum::routing::get;
+use axum::routing::{get, put};
 use axum::{Extension, Router};
+use handlers::add_role_member::add_role_member;
 use handlers::get_members_guild::get_members_guild;
 use tracing::{info, info_span};
 
@@ -92,5 +93,10 @@ fn api_routes<M>() -> axum::Router<AppState<M>>
 where
     M: MemberService,
 {
-    axum::Router::new().route("/guilds/:guild_id/members", get(get_members_guild::<M>))
+    axum::Router::new()
+        .route("/guilds/:guild_id/members", get(get_members_guild::<M>))
+        .route(
+            "/guilds/:guild_id/members/:user_id/roles/:role_id",
+            put(add_role_member),
+        )
 }

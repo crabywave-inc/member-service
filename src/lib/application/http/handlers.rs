@@ -2,7 +2,9 @@ use crate::application::http::responses::ApiResponseError;
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde::Serialize;
 
+pub mod add_role_member;
 pub mod get_members_guild;
+pub mod remove_role_member;
 
 pub struct ApiSuccess<T: Serialize + PartialEq>(StatusCode, Json<ApiResponseBody<T>>);
 
