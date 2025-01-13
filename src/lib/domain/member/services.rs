@@ -1,4 +1,7 @@
-use super::ports::{MemberRepository, MemberService};
+use super::{
+    entities::{error::MemberError, model::Member},
+    ports::{MemberRepository, MemberService},
+};
 
 #[derive(Debug, Clone)]
 pub struct MemberServiceImpl<M>
@@ -21,24 +24,15 @@ impl<M> MemberService for MemberServiceImpl<M>
 where
     M: MemberRepository,
 {
-    async fn find_by_id(
-        &self,
-        _id: &str,
-    ) -> Result<super::entities::model::Member, super::entities::error::MemberError> {
-        unimplemented!()
+    async fn find_by_id(&self, id: &str) -> Result<Member, MemberError> {
+        self.member_repository.find_by_id(id).await
     }
 
-    async fn find_by_user_id(
-        &self,
-        _user_id: &str,
-    ) -> Result<super::entities::model::Member, super::entities::error::MemberError> {
-        unimplemented!()
+    async fn find_by_user_id(&self, user_id: &str) -> Result<Member, MemberError> {
+        self.member_repository.find_by_user_id(user_id).await
     }
 
-    async fn find_by_guild_id(
-        &self,
-        id: &str,
-    ) -> Result<Vec<super::entities::model::Member>, super::entities::error::MemberError> {
+    async fn find_by_guild_id(&self, id: &str) -> Result<Vec<Member>, MemberError> {
         self.member_repository.find_by_guild_id(id).await
     }
 }
