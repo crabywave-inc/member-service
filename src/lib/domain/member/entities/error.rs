@@ -12,4 +12,6 @@ pub enum MemberError {
     CreateError(String),
     #[error("Failed to delete member: {0}")]
     DeleteError(String),
+    #[error("Failed to add role: {0}")]
+    AddRoleError(String),
 }

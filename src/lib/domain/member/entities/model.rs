@@ -4,17 +4,19 @@ use serde::{Deserialize, Serialize};
 pub struct Member {
     pub id: String,
     pub user_id: String,
+    pub guild_id: String,
     pub nick: Option<String>,
-    pub roles: Vec<String>,
+    pub role_ids: Vec<String>,
 }
 
 impl Member {
-    pub fn new(user_id: String) -> Self {
+    pub fn new(user_id: String, guild_id: String) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
             user_id,
+            guild_id,
             nick: None,
-            roles: vec![],
+            role_ids: vec![],
         }
     }
 }
