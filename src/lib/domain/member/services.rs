@@ -41,4 +41,8 @@ where
     async fn find_by_guild_id(&self, id: &str) -> Result<Vec<Member>, MemberError> {
         self.member_repository.find_by_guild_id(id).await
     }
+
+    async fn create(&self, user_id: String) -> Result<Member, MemberError> {
+        self.member_repository.create(user_id).await
+    }
 }

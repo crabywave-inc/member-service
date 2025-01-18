@@ -12,6 +12,7 @@ pub trait MemberService: Clone + Send + Sync + 'static {
         &self,
         id: &str,
     ) -> impl Future<Output = Result<Vec<Member>, MemberError>> + Send;
+    fn create(&self, user_id: String) -> impl Future<Output = Result<Member, MemberError>> + Send;
 }
 
 pub trait MemberRepository: Clone + Send + Sync + 'static {
@@ -27,4 +28,5 @@ pub trait MemberRepository: Clone + Send + Sync + 'static {
         &self,
         guild_id: &str,
     ) -> impl Future<Output = Result<Vec<Member>, MemberError>> + Send;
+    fn create(&self, user_id: String) -> impl Future<Output = Result<Member, MemberError>> + Send;
 }

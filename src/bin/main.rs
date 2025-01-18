@@ -39,12 +39,12 @@ async fn main() -> Result<()> {
     let messaging =
         Arc::new(MessagingTypeImpl::new(&MessagingType::PubSub, Arc::clone(&env)).await?);
 
-    subscribe_to_guild_created(Arc::clone(&messaging)).await?;
-
     let firestore = Arc::new(Firestore::new(Arc::clone(&env)).await?);
 
     let member_repository = FirestoreMemberRepository::new(Arc::clone(&firestore));
     let member_service = Arc::new(MemberServiceImpl::new(member_repository));
+
+    subscribe_to_guild_created(Arc::clone(&messaging), Arc::clone(&member_service)).await?;
 
     let server_config = HttpServerConfig::new(env.port.clone());
     let http_server =

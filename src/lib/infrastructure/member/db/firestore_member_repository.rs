@@ -68,4 +68,21 @@ impl MemberRepository for FirestoreMemberRepository {
 
         Ok(members)
     }
+
+    async fn create(&self, user_id: String) -> Result<Member, MemberError> {
+        let member = Member::new(user_id);
+
+        self.firestore
+            .db
+            .fluent()
+            .insert()
+            .into("members")
+            .document_id(&member.id)
+            .object(&member)
+            .execute::<()>()
+            .await
+            .map_err(|e| MemberError::CreateError(e.to_string()))?;
+
+        Ok(member)
+    }
 }
