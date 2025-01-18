@@ -2,6 +2,7 @@ use anyhow::Result;
 use futures::StreamExt;
 use google_cloud_googleapis::pubsub::v1::PubsubMessage;
 use google_cloud_pubsub::client::{Client, ClientConfig};
+use serde::Serialize;
 use std::sync::Arc;
 
 use crate::application::ports::messaging_ports::MessagingPort;
@@ -26,7 +27,7 @@ impl PubSubMessaging {
 }
 
 impl MessagingPort for PubSubMessaging {
-    async fn publish_message(&self, topic: String, message: String) -> anyhow::Result<()> {
+    async fn publish_message<T: Serialize>(&self, topic: String, message: T) -> anyhow::Result<()> {
         let t = format!("projects/{}/topics/{}", self.project_id, topic);
 
         let topic = self.client.topic(&t);
@@ -35,10 +36,12 @@ impl MessagingPort for PubSubMessaging {
             tracing::error!("Topic {} does not exist", t);
         }
 
+        let message_str = serde_json::to_string(&message)?;
+
         let publisher = topic.new_publisher(None);
 
         let msg = PubsubMessage {
-            data: message.into(),
+            data: message_str.into(),
             ordering_key: "order".into(),
             ..Default::default()
         };

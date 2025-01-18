@@ -3,7 +3,11 @@ use std::sync::Arc;
 use anyhow::Result;
 use clap::Parser;
 use member::{
-    application::http::{HttpServer, HttpServerConfig},
+    application::{
+        http::{HttpServer, HttpServerConfig},
+        messaging::subscribe_to_guild_created,
+        ports::messaging_ports::{MessagingType, MessagingTypeImpl},
+    },
     domain::member::services::MemberServiceImpl,
     env::Env,
     infrastructure::member::db::firestore_member_repository::FirestoreMemberRepository,
@@ -31,6 +35,11 @@ async fn main() -> Result<()> {
     let env = Arc::new(Env::parse());
 
     init_logger(Arc::clone(&env));
+
+    let messaging =
+        Arc::new(MessagingTypeImpl::new(&MessagingType::PubSub, Arc::clone(&env)).await?);
+
+    subscribe_to_guild_created(Arc::clone(&messaging)).await?;
 
     let firestore = Arc::new(Firestore::new(Arc::clone(&env)).await?);
 

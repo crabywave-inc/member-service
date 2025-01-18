@@ -62,7 +62,7 @@ impl HttpServer {
         let auth_layer = AuthenticationLayer::new(env.auth_service_url.clone());
 
         let router = Router::new()
-            .nest("", api_routes())
+            .merge(api_routes())
             .layer(trace_layer)
             .layer(auth_layer)
             .layer(Extension(Arc::clone(&state.member_service)))
@@ -94,9 +94,9 @@ where
     M: MemberService,
 {
     axum::Router::new()
-        .route("/guilds/:guild_id/members", get(get_members_guild::<M>))
+        .route("/guilds/{guild_id}/members", get(get_members_guild::<M>))
         .route(
-            "/guilds/:guild_id/members/:user_id/roles/:role_id",
+            "/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
             put(add_role_member),
         )
 }
