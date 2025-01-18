@@ -97,6 +97,6 @@ where
         .route("/guilds/{guild_id}/members", get(get_members_guild::<M>))
         .route(
             "/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
-            put(add_role_member),
+            put(add_role_member::<M>),
         )
 }

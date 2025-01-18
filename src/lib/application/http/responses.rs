@@ -39,6 +39,7 @@ impl From<MemberError> for ApiError {
             MemberError::Forbidden => ApiError::Forbidden("Forbidden".to_string()),
             MemberError::CreateError(e) => ApiError::InternalServerError(e),
             MemberError::DeleteError(e) => ApiError::InternalServerError(e),
+            MemberError::AddRoleError(e) => ApiError::InternalServerError(e),
         }
     }
 }

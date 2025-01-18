@@ -22,7 +22,7 @@ where
                 let member_service = Arc::clone(&member_service);
 
                 async move {
-                    let member = member_service.create(e.owner_id).await?;
+                    let member = member_service.create(e.owner_id, e.id).await?;
 
                     info!("Member created: {:?}", member);
 
