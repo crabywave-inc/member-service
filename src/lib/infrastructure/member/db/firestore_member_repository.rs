@@ -35,6 +35,31 @@ impl MemberRepository for FirestoreMemberRepository {
         Ok(member)
     }
 
+    async fn find_by_user_id_and_guild_id(
+        &self,
+        user_id: &str,
+        guild_id: &str,
+    ) -> Result<Member, MemberError> {
+        self.firestore
+            .db
+            .fluent()
+            .select()
+            .from("members")
+            .filter(|q| {
+                q.for_all([
+                    q.field("user_id").eq(user_id),
+                    q.field("guild_id").eq(guild_id),
+                ])
+            })
+            .obj::<Member>()
+            .query()
+            .await
+            .map_err(|_| MemberError::NotFound)?
+            .first()
+            .cloned()
+            .ok_or(MemberError::NotFound)
+    }
+
     async fn find_by_user_id(&self, user_id: &str) -> Result<Option<Member>, MemberError> {
         let members = self
             .firestore
@@ -69,19 +94,52 @@ impl MemberRepository for FirestoreMemberRepository {
         Ok(members)
     }
 
-    async fn create(&self, user_id: String) -> Result<Member, MemberError> {
-        let member = Member::new(user_id);
+    async fn create(&self, user_id: String, guild_id: String) -> Result<Member, MemberError> {
+        let member = Member::new(user_id, guild_id);
 
         self.firestore
             .db
             .fluent()
             .insert()
             .into("members")
-            .document_id(&member.id)
+            .document_id(&member.user_id)
             .object(&member)
             .execute::<()>()
             .await
             .map_err(|e| MemberError::CreateError(e.to_string()))?;
+
+        Ok(member)
+    }
+
+    async fn add_role(
+        &self,
+        guild_id: String,
+        user_id: String,
+        role_id: String,
+    ) -> Result<Member, MemberError> {
+        let member = self
+            .find_by_user_id_and_guild_id(&user_id, &guild_id)
+            .await?;
+
+        let mut updated_role_ids = member.role_ids.clone();
+
+        if !updated_role_ids.contains(&role_id.to_string()) {
+            updated_role_ids.push(role_id.to_string());
+        }
+
+        self.firestore
+            .db
+            .fluent()
+            .update()
+            .in_col("members")
+            .document_id(&member.id)
+            .object(&Member {
+                role_ids: updated_role_ids,
+                ..member.clone()
+            })
+            .execute::<()>()
+            .await
+            .map_err(|e| MemberError::AddRoleError(e.to_string()))?;
 
         Ok(member)
     }
